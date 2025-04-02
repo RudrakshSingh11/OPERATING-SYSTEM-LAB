@@ -1,0 +1,92 @@
+multilevel queue
+#include <stdio.h>
+
+#define MAX 10
+
+typedef struct {
+    int pid;
+    int arrival_time;
+    int burst_time;
+    int priority;
+    int completion_time;
+    int turnaround_time;
+    int waiting_time;
+    int response_time;
+} Process;
+
+void sort_by_priority(Process queue[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if (queue[i].priority > queue[j].priority) {
+                Process temp = queue[i];
+                queue[i] = queue[j];
+                queue[j] = temp;
+            }
+        }
+    }
+}
+
+void calculate_times(Process queue[], int n) {
+    int current_time = 0;
+    for (int i = 0; i < n; i++) {
+        if (current_time < queue[i].arrival_time) {
+            current_time = queue[i].arrival_time;
+        }
+        queue[i].completion_time = current_time + queue[i].burst_time;
+        queue[i].turnaround_time = queue[i].completion_time - queue[i].arrival_time;
+        queue[i].waiting_time = queue[i].turnaround_time - queue[i].burst_time;
+        queue[i].response_time = queue[i].waiting_time;
+        current_time = queue[i].completion_time;
+    }
+}
+
+void schedule_fcfs(Process queue[], int n) {
+    printf("\nFCFS Scheduling:\n");
+    calculate_times(queue, n);
+    printf("PID  Arrival  Burst Time  Completion  TAT  WT  RT\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d    %d       %d          %d          %d   %d   %d\n", 
+               queue[i].pid, queue[i].arrival_time, queue[i].burst_time, 
+               queue[i].completion_time, queue[i].turnaround_time, 
+               queue[i].waiting_time, queue[i].response_time);
+    }
+}
+
+void schedule_priority(Process queue[], int n) {
+    printf("\nPriority Scheduling:\n");
+    sort_by_priority(queue, n);
+    calculate_times(queue, n);
+    printf("PID  Priority  Arrival  Burst Time  Completion  TAT  WT  RT\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d    %d         %d       %d          %d          %d   %d   %d\n", 
+               queue[i].pid, queue[i].priority, queue[i].arrival_time, queue[i].burst_time, 
+               queue[i].completion_time, queue[i].turnaround_time, 
+               queue[i].waiting_time, queue[i].response_time);
+    }
+}
+
+int main() {
+    int n;
+    Process queue1[MAX], queue2[MAX];
+    int q1_count = 0, q2_count = 0;
+
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+
+    for (int i = 0; i < n; i++) {
+        Process p;
+        printf("Enter PID, Arrival Time, Burst Time, and Priority for Process %d: ", i + 1);
+        scanf("%d %d %d %d", &p.pid, &p.arrival_time, &p.burst_time, &p.priority);
+        
+        if (p.priority < 3) {
+            queue1[q1_count++] = p;
+        } else {
+            queue2[q2_count++] = p;
+        }
+    }
+
+    schedule_priority(queue1, q1_count);
+    schedule_fcfs(queue2, q2_count);
+
+    return 0;
+}
