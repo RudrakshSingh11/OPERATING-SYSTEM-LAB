@@ -1,0 +1,64 @@
+#include <stdio.h>
+
+#define MAX 10
+
+int main() {
+    int n, burst[MAX], deadline[MAX], period[MAX];
+    int time = 0;
+
+    printf("Enter the number of processes:");
+    scanf("%d", &n);
+
+    printf("Enter the CPU burst times:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &burst[i]);
+    }
+
+    printf("Enter the deadlines:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &deadline[i]);
+    }
+
+    printf("Enter the time periods:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &period[i]);
+    }
+
+    printf("\nEarliest Deadline Scheduling:\n");
+    printf("PID\tBurst\tDeadline\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t%d\t%d\n", i + 1, burst[i], deadline[i]);
+    }
+
+    // Scheduling (single instance based on earliest deadline)
+    int remaining[MAX], completed[MAX];
+    for (int i = 0; i < n; i++) {
+        remaining[i] = burst[i];
+        completed[i] = 0;
+    }
+
+    int total = 0;
+    for (int i = 0; i < n; i++) total += burst[i];
+    printf("\nScheduling occurs for %d ms\n", total);
+
+    while (time < total) {
+        int min_deadline = 9999, idx = -1;
+
+        // Select the task with earliest deadline among incomplete tasks
+        for (int i = 0; i < n; i++) {
+            if (!completed[i] && deadline[i] < min_deadline) {
+                min_deadline = deadline[i];
+                idx = i;
+            }
+        }
+
+        // Run the selected task to completion
+        for (int j = 0; j < burst[idx]; j++) {
+            printf("%dms : Task %d is running.\n", time, idx + 1);
+            time++;
+        }
+        completed[idx] = 1;
+    }
+
+    return 0;
+}
