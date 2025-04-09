@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <math.h>
+
+#define MAX 10
+
+int lcm(int a, int b) {
+    int temp_a = a, temp_b = b;
+    while (temp_b != 0) {
+        int t = temp_b;
+        temp_b = temp_a % temp_b;
+        temp_a = t;
+    }
+    return (a * b) / temp_a;
+}
+
+int main() {
+    int n, burst[MAX], period[MAX];
+    float utilization = 0;
+
+    printf("Enter the number of processes:");
+    scanf("%d", &n);
+
+    printf("Enter the CPU burst times:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &burst[i]);
+    }
+
+    printf("Enter the time periods:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &period[i]);
+    }
+
+    // Calculate LCM of periods
+    int total_lcm = period[0];
+    for (int i = 1; i < n; i++) {
+        total_lcm = lcm(total_lcm, period[i]);
+    }
+
+    printf("LCM=%d\n\n", total_lcm);
+
+    printf("Rate Monotone Scheduling:\n");
+    printf("PID\tBurst\tPeriod\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t%d\t%d\n", i + 1, burst[i], period[i]);
+        utilization += (float)burst[i] / period[i];
+    }
+
+    float bound = n * (pow(2, (1.0 / n)) - 1);
+    printf("\n%.6f <= %.6f => %s\n", bound, utilization, (utilization <= bound) ? "true" : "false");
+
+    return 0;
+}
+
